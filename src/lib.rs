@@ -1,12 +1,24 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{console, window, HtmlElement, HtmlInputElement, HtmlTextAreaElement, Request, RequestInit, RequestMode, Headers, Response, Event};
-use serde::{Deserialize, Serialize};
+use web_sys::{
+    console,
+    window,
+    HtmlElement,
+    HtmlInputElement,
+    HtmlTextAreaElement,
+    Request,
+    RequestInit,
+    RequestMode,
+    Headers,
+    Response,
+    Event,
+};
+use serde::{ Deserialize, Serialize };
 
 macro_rules! log {
-    ( $( $t:tt )* ) => {
+    ($($t:tt)*) => {
         console::log_1(&format!( $( $t )* ).into());
-    }
+    };
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -41,7 +53,7 @@ impl QuoteManager {
     #[wasm_bindgen]
     pub async fn fetch_quotes(&self) -> Result<JsValue, JsValue> {
         let url = format!("{}/quotes", self.api_base);
-        
+
         let opts = RequestInit::new();
         opts.set_method("GET");
         opts.set_mode(RequestMode::Cors);
@@ -51,26 +63,31 @@ impl QuoteManager {
         let window = window().unwrap();
         let resp_value = window.fetch_with_request(&request);
         let resp: Response = JsFuture::from(resp_value).await?.dyn_into()?;
-        
+
         let json = JsFuture::from(resp.json()?).await?;
         Ok(json)
     }
 
-     #[wasm_bindgen]
-    pub async fn create_quote(&self, quote: &str, author: Option<String>) -> Result<JsValue, JsValue> {
+    #[wasm_bindgen]
+    pub async fn create_quote(
+        &self,
+        quote: &str,
+        author: Option<String>
+    ) -> Result<JsValue, JsValue> {
         let url = format!("{}/quotes", self.api_base);
-        
+
         let create_quote = CreateQuote {
             quote: quote.to_string(),
             author,
         };
 
-        let body_json = serde_json::to_string(&create_quote).map_err(|e| JsValue::from_str(&e.to_string()))?;
+        let body_json = serde_json
+            ::to_string(&create_quote)
+            .map_err(|e| JsValue::from_str(&e.to_string()))?;
 
         let opts = RequestInit::new();
         opts.set_method("POST");
         opts.set_mode(RequestMode::Cors);
-        
 
         let body_js = JsValue::from_str(&body_json);
         opts.set_body(&body_js);
@@ -84,7 +101,7 @@ impl QuoteManager {
         let window = window().unwrap();
         let resp_value = window.fetch_with_request(&request);
         let resp: Response = JsFuture::from(resp_value).await?.dyn_into()?;
-        
+
         let json = JsFuture::from(resp.json()?).await?;
         Ok(json)
     }
@@ -92,7 +109,7 @@ impl QuoteManager {
     #[wasm_bindgen]
     pub async fn get_random_quote(&self) -> Result<JsValue, JsValue> {
         let url = format!("{}/quotes/random", self.api_base);
-        
+
         let opts = RequestInit::new();
         opts.set_method("GET");
         opts.set_mode(RequestMode::Cors);
@@ -102,10 +119,32 @@ impl QuoteManager {
         let window = window().unwrap();
         let resp_value = window.fetch_with_request(&request);
         let resp: Response = JsFuture::from(resp_value).await?.dyn_into()?;
-        
+
         let json = JsFuture::from(resp.json()?).await?;
         Ok(json)
     }
+
+    #[wasm_bindgen]
+pub async fn get_quote_by_id(&self, id: &str) -> Result<JsValue, JsValue> {
+    let url = format!("{}/quotes/{}", self.api_base, id);
+
+    let opts = RequestInit::new();
+    opts.set_method("GET");
+    opts.set_mode(RequestMode::Cors);
+
+    let request = Request::new_with_str_and_init(&url, &opts)?;
+
+    let window = window().unwrap();
+    let resp_value = window.fetch_with_request(&request);
+    let resp: Response = JsFuture::from(resp_value).await?.dyn_into()?;
+
+    if resp.ok() {
+        let json = JsFuture::from(resp.json()?).await?;
+        Ok(json)
+    } else {
+        Err(JsValue::from_str(&format!("HTTP {}: Quote not found", resp.status())))
+    }
+}
 }
 
 #[wasm_bindgen(start)]
@@ -118,11 +157,11 @@ pub fn main() {
 pub fn init_app() {
     let win = window().unwrap();
     let document = win.document().unwrap();
-    
+
     if let Some(count_element) = document.get_element_by_id("quote-count") {
         count_element.set_text_content(Some("Loading..."));
     }
-    
+
     setup_modal();
     setup_form_handlers();
     load_quotes();
@@ -134,24 +173,28 @@ fn setup_modal() {
 
     if let Some(modal_close) = document.get_element_by_id("modal-close") {
         let modal_close: HtmlElement = modal_close.dyn_into().unwrap();
-        let closure = Closure::wrap(Box::new(move || {
-            close_modal();
-        }) as Box<dyn Fn()>);
-        
+        let closure = Closure::wrap(
+            Box::new(move || {
+                close_modal();
+            }) as Box<dyn Fn()>
+        );
+
         modal_close.set_onclick(Some(closure.as_ref().unchecked_ref()));
         closure.forget();
     }
 
     if let Some(modal_bg) = document.get_element_by_id("quote-modal") {
         let modal_bg: HtmlElement = modal_bg.dyn_into().unwrap();
-        let closure = Closure::wrap(Box::new(move |event: Event| {
-            if let Some(target) = event.target() {
-                if target == event.current_target().unwrap() {
-                    close_modal();
+        let closure = Closure::wrap(
+            Box::new(move |event: Event| {
+                if let Some(target) = event.target() {
+                    if target == event.current_target().unwrap() {
+                        close_modal();
+                    }
                 }
-            }
-        }) as Box<dyn Fn(Event)>);
-        
+            }) as Box<dyn Fn(Event)>
+        );
+
         modal_bg.set_onclick(Some(closure.as_ref().unchecked_ref()));
         closure.forget();
     }
@@ -163,20 +206,24 @@ fn setup_form_handlers() {
 
     if let Some(add_btn) = document.get_element_by_id("add-quote-btn") {
         let add_btn: HtmlElement = add_btn.dyn_into().unwrap();
-        let closure = Closure::wrap(Box::new(move || {
-            show_add_quote_form();
-        }) as Box<dyn Fn()>);
-        
+        let closure = Closure::wrap(
+            Box::new(move || {
+                show_add_quote_form();
+            }) as Box<dyn Fn()>
+        );
+
         add_btn.set_onclick(Some(closure.as_ref().unchecked_ref()));
         closure.forget();
     }
 
     if let Some(random_btn) = document.get_element_by_id("random-quote-btn") {
         let random_btn: HtmlElement = random_btn.dyn_into().unwrap();
-        let closure = Closure::wrap(Box::new(move || {
-            get_random_quote();
-        }) as Box<dyn Fn()>);
-        
+        let closure = Closure::wrap(
+            Box::new(move || {
+                get_random_quote();
+            }) as Box<dyn Fn()>
+        );
+
         random_btn.set_onclick(Some(closure.as_ref().unchecked_ref()));
         closure.forget();
     }
@@ -188,7 +235,8 @@ fn show_add_quote_form() {
 
     if let Some(modal) = document.get_element_by_id("quote-modal") {
         if let Some(modal_content) = document.get_element_by_id("modal-content") {
-            modal_content.set_inner_html(r#"
+            modal_content.set_inner_html(
+                r#"
                 <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 transform transition-all">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-2xl font-bold text-gray-800">Add New Quote</h3>
@@ -217,11 +265,12 @@ fn show_add_quote_form() {
                         </div>
                     </form>
                 </div>
-            "#);
+            "#
+            );
 
             let modal: HtmlElement = modal.dyn_into().unwrap();
             modal.class_list().remove_1("hidden").unwrap();
-            
+
             setup_add_quote_form();
         }
     }
@@ -233,31 +282,37 @@ fn setup_add_quote_form() {
 
     if let Some(form) = document.get_element_by_id("quote-form") {
         let form: HtmlElement = form.dyn_into().unwrap();
-        let closure = Closure::wrap(Box::new(move |event: Event| {
-            event.prevent_default();
-            submit_quote_form();
-        }) as Box<dyn Fn(Event)>);
-        
+        let closure = Closure::wrap(
+            Box::new(move |event: Event| {
+                event.prevent_default();
+                submit_quote_form();
+            }) as Box<dyn Fn(Event)>
+        );
+
         form.set_onsubmit(Some(closure.as_ref().unchecked_ref()));
         closure.forget();
     }
 
     if let Some(cancel_btn) = document.get_element_by_id("cancel-btn") {
         let cancel_btn: HtmlElement = cancel_btn.dyn_into().unwrap();
-        let closure = Closure::wrap(Box::new(move || {
-            close_modal();
-        }) as Box<dyn Fn()>);
-        
+        let closure = Closure::wrap(
+            Box::new(move || {
+                close_modal();
+            }) as Box<dyn Fn()>
+        );
+
         cancel_btn.set_onclick(Some(closure.as_ref().unchecked_ref()));
         closure.forget();
     }
 
     if let Some(modal_close) = document.get_element_by_id("modal-close") {
         let modal_close: HtmlElement = modal_close.dyn_into().unwrap();
-        let closure = Closure::wrap(Box::new(move || {
-            close_modal();
-        }) as Box<dyn Fn()>);
-        
+        let closure = Closure::wrap(
+            Box::new(move || {
+                close_modal();
+            }) as Box<dyn Fn()>
+        );
+
         modal_close.set_onclick(Some(closure.as_ref().unchecked_ref()));
         closure.forget();
     }
@@ -308,10 +363,12 @@ fn load_quotes() {
         let manager = QuoteManager::new();
         match manager.fetch_quotes().await {
             Ok(quotes_js) => {
-                let quotes: Vec<Quote> = serde_wasm_bindgen::from_value(quotes_js).unwrap_or_default();
+                let quotes: Vec<Quote> = serde_wasm_bindgen
+                    ::from_value(quotes_js)
+                    .unwrap_or_default();
                 let quote_count = quotes.len();
                 display_quotes(quotes);
-      
+
                 let win = window().unwrap();
                 let document = win.document().unwrap();
                 if let Some(count_element) = document.get_element_by_id("quote-count") {
@@ -352,8 +409,8 @@ fn show_error_modal(message: &str) {
 
     if let Some(modal) = document.get_element_by_id("quote-modal") {
         if let Some(modal_content) = document.get_element_by_id("modal-content") {
-            modal_content.set_inner_html(&format!(
-                r#"
+            modal_content.set_inner_html(
+                &format!(r#"
                 <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 transform transition-all">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-2xl font-bold text-gray-800">Oops!</h3>
@@ -370,29 +427,32 @@ fn show_error_modal(message: &str) {
                         </button>
                     </div>
                 </div>
-                "#,
-                message
-            ));
+                "#, message)
+            );
 
             let modal: HtmlElement = modal.dyn_into().unwrap();
             modal.class_list().remove_1("hidden").unwrap();
-            
+
             if let Some(modal_close) = document.get_element_by_id("modal-close") {
                 let modal_close: HtmlElement = modal_close.dyn_into().unwrap();
-                let closure = Closure::wrap(Box::new(move || {
-                    close_modal();
-                }) as Box<dyn Fn()>);
-                
+                let closure = Closure::wrap(
+                    Box::new(move || {
+                        close_modal();
+                    }) as Box<dyn Fn()>
+                );
+
                 modal_close.set_onclick(Some(closure.as_ref().unchecked_ref()));
                 closure.forget();
             }
 
             if let Some(close_error) = document.get_element_by_id("close-error") {
                 let close_error: HtmlElement = close_error.dyn_into().unwrap();
-                let closure = Closure::wrap(Box::new(move || {
-                    close_modal();
-                }) as Box<dyn Fn()>);
-                
+                let closure = Closure::wrap(
+                    Box::new(move || {
+                        close_modal();
+                    }) as Box<dyn Fn()>
+                );
+
                 close_error.set_onclick(Some(closure.as_ref().unchecked_ref()));
                 closure.forget();
             }
@@ -406,7 +466,7 @@ fn display_quotes(quotes: Vec<Quote>) {
 
     if let Some(quotes_container) = document.get_element_by_id("quotes-container") {
         let mut html = String::new();
-        
+
         for quote in quotes {
             let author = quote.author.unwrap_or_else(|| "Unknown".to_string());
             let preview = if quote.quote.len() > 120 {
@@ -414,9 +474,10 @@ fn display_quotes(quotes: Vec<Quote>) {
             } else {
                 quote.quote.clone()
             };
-            
-            html.push_str(&format!(
-                r#"
+
+            html.push_str(
+                &format!(
+                    r#"
                 <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 cursor-pointer quote-card" data-id="{}">
                     <blockquote class="text-gray-800 font-medium leading-relaxed mb-4">
                         "{}"
@@ -427,15 +488,17 @@ fn display_quotes(quotes: Vec<Quote>) {
                     </div>
                 </div>
                 "#,
-                quote.id,
-                preview,
-                author,
-                quote.created_at.split('T').next().unwrap_or("")
-            ));
+                    quote.id,
+                    preview,
+                    author,
+                    quote.created_at.split('T').next().unwrap_or("")
+                )
+            );
         }
 
         if html.is_empty() {
-            html = r#"
+            html =
+                r#"
                 <div class="col-span-full text-center py-12">
                     <div class="text-white text-opacity-70 text-lg">No quotes found. Be the first to add one!</div>
                 </div>
@@ -458,10 +521,12 @@ fn setup_quote_card_handlers() {
                 let card: HtmlElement = card.dyn_into().unwrap();
                 if let Some(quote_id) = card.get_attribute("data-id") {
                     let quote_id_clone = quote_id.clone();
-                    let closure = Closure::wrap(Box::new(move || {
-                        show_quote_detail(&quote_id_clone);
-                    }) as Box<dyn Fn()>);
-                    
+                    let closure = Closure::wrap(
+                        Box::new(move || {
+                            show_quote_detail(&quote_id_clone);
+                        }) as Box<dyn Fn()>
+                    );
+
                     card.set_onclick(Some(closure.as_ref().unchecked_ref()));
                     closure.forget();
                 }
@@ -473,8 +538,17 @@ fn setup_quote_card_handlers() {
 fn show_quote_detail(quote_id: &str) {
     let quote_id_owned = quote_id.to_string();
     wasm_bindgen_futures::spawn_local(async move {
-        let _manager = QuoteManager::new();
-        show_detail_modal(&quote_id_owned);
+        let manager = QuoteManager::new();
+        match manager.get_quote_by_id(&quote_id_owned).await {
+            Ok(quote_js) => {
+                let quote: Quote = serde_wasm_bindgen::from_value(quote_js).unwrap();
+                show_quote_modal(&quote);
+            }
+            Err(e) => {
+                log!("Error fetching quote: {:?}", e);
+                show_error_modal("Could not load quote details.");
+            }
+        }
     });
 }
 
@@ -484,8 +558,8 @@ fn show_detail_modal(quote_id: &str) {
 
     if let Some(modal) = document.get_element_by_id("quote-modal") {
         if let Some(modal_content) = document.get_element_by_id("modal-content") {
-            modal_content.set_inner_html(&format!(
-                r#"
+            modal_content.set_inner_html(
+                &format!(r#"
                 <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 transform transition-all">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-2xl font-bold text-gray-800">Quote Details</h3>
@@ -502,19 +576,20 @@ fn show_detail_modal(quote_id: &str) {
                         </div>
                     </div>
                 </div>
-                "#,
-                quote_id
-            ));
+                "#, quote_id)
+            );
 
             let modal: HtmlElement = modal.dyn_into().unwrap();
             modal.class_list().remove_1("hidden").unwrap();
 
             if let Some(modal_close) = document.get_element_by_id("modal-close") {
                 let modal_close: HtmlElement = modal_close.dyn_into().unwrap();
-                let closure = Closure::wrap(Box::new(move || {
-                    close_modal();
-                }) as Box<dyn Fn()>);
-                
+                let closure = Closure::wrap(
+                    Box::new(move || {
+                        close_modal();
+                    }) as Box<dyn Fn()>
+                );
+
                 modal_close.set_onclick(Some(closure.as_ref().unchecked_ref()));
                 closure.forget();
             }
@@ -529,9 +604,10 @@ fn show_quote_modal(quote: &Quote) {
     if let Some(modal) = document.get_element_by_id("quote-modal") {
         if let Some(modal_content) = document.get_element_by_id("modal-content") {
             let author = quote.author.clone().unwrap_or_else(|| "Unknown".to_string());
-            
-            modal_content.set_inner_html(&format!(
-                r#"
+
+            modal_content.set_inner_html(
+                &format!(
+                    r#"
                 <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 transform transition-all">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-2xl font-bold text-gray-800">Random Quote</h3>
@@ -553,30 +629,35 @@ fn show_quote_modal(quote: &Quote) {
                     </div>
                 </div>
                 "#,
-                quote.quote,
-                author,
-                quote.created_at.split('T').next().unwrap_or("")
-            ));
+                    quote.quote,
+                    author,
+                    quote.created_at.split('T').next().unwrap_or("")
+                )
+            );
 
             let modal: HtmlElement = modal.dyn_into().unwrap();
             modal.class_list().remove_1("hidden").unwrap();
 
             if let Some(modal_close) = document.get_element_by_id("modal-close") {
                 let modal_close: HtmlElement = modal_close.dyn_into().unwrap();
-                let closure = Closure::wrap(Box::new(move || {
-                    close_modal();
-                }) as Box<dyn Fn()>);
-                
+                let closure = Closure::wrap(
+                    Box::new(move || {
+                        close_modal();
+                    }) as Box<dyn Fn()>
+                );
+
                 modal_close.set_onclick(Some(closure.as_ref().unchecked_ref()));
                 closure.forget();
             }
 
             if let Some(another_btn) = document.get_element_by_id("another-random") {
                 let another_btn: HtmlElement = another_btn.dyn_into().unwrap();
-                let closure = Closure::wrap(Box::new(move || {
-                    get_random_quote();
-                }) as Box<dyn Fn()>);
-                
+                let closure = Closure::wrap(
+                    Box::new(move || {
+                        get_random_quote();
+                    }) as Box<dyn Fn()>
+                );
+
                 another_btn.set_onclick(Some(closure.as_ref().unchecked_ref()));
                 closure.forget();
             }
