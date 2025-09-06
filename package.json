@@ -1,13 +1,14 @@
 {
-  "name": "rusted-quotes",
+  "name": "rusted_quotes",
   "version": "1.0.0",
   "scripts": {
     "dev": "trunk serve",
     "build": "trunk build --release",
-    "clean": "trunk clean",
     "server": "cargo run --bin server --features server",
+    "server:prod": "cargo run --bin server --features server --release",
     "dev-full": "concurrently \"npm run server\" \"npm run dev\"",
-    "setup-db": "mysql -u root -p -e \"CREATE DATABASE IF NOT EXISTS quotes_db;\""
+    "build:all": "npm run build && cargo build --bin server --features server --release",
+    "start": "node ecosystem.config.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
