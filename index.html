@@ -6,123 +6,434 @@
     <title>Rusted Quotes - Inspire & Be Inspired</title>
     <link data-trunk rel="rust" />
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'primary': ['Space Grotesk', 'system-ui', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'Consolas', 'monospace'],
+                    },
+                    colors: {
+                        'dark': {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            850: '#1a202c',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        'neon': {
+                            'cyan': '#00ffff',
+                            'green': '#00ff41',
+                            'pink': '#ff0080',
+                            'purple': '#8b5cf6',
+                            'blue': '#3b82f6',
+                        }
                     },
                     animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'slide-up': 'slideUp 0.3s ease-out',
-                        'float': 'float 6s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'slide-down': 'slideDown 0.4s ease-out',
+                        'float': 'float 8s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite alternate',
+                        'typing': 'typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite',
+                        'matrix': 'matrix 20s linear infinite',
+                        'cyber-grid': 'cyberGrid 15s linear infinite',
+                    },
+                    backgroundImage: {
+                        'cyber-grid': 'linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px)',
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
                     }
                 }
             }
         }
     </script>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
         
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(-10px) rotate(240deg); }
+        }
+        
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), 0 0 40px rgba(139, 92, 246, 0.3); }
+            to { box-shadow: 0 0 30px rgba(0, 255, 255, 0.8), 0 0 60px rgba(139, 92, 246, 0.5); }
+        }
+        
+        @keyframes matrix {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+        
+        @keyframes cyberGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
         }
 
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .cyber-border {
+            position: relative;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .cyber-border::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: linear-gradient(45deg, 
+                transparent 25%, 
+                rgba(0, 255, 255, 0.2) 25%, 
+                rgba(0, 255, 255, 0.2) 50%, 
+                transparent 50%, 
+                transparent 75%, 
+                rgba(139, 92, 246, 0.2) 75%);
+            background-size: 20px 20px;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .cyber-border:hover::before {
+            opacity: 1;
         }
 
-        .glass-effect {
-            backdrop-filter: blur(16px) saturate(180%);
-            background-color: rgba(255, 255, 255, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.125);
+        .glass-morphism {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(0, 255, 255, 0.1);
         }
 
-        .quote-card:hover {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
+        .matrix-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(90deg, transparent 95%, rgba(0, 255, 255, 0.05) 100%),
+                linear-gradient(180deg, transparent 95%, rgba(0, 255, 255, 0.05) 100%);
+            background-size: 50px 50px;
+            animation: cyber-grid 15s linear infinite;
+            pointer-events: none;
         }
 
-        .quote-card:hover cite {
-            color: rgba(255, 255, 255, 0.9);
+        .text-gradient {
+            background: linear-gradient(135deg, #00ffff 0%, #8b5cf6 50%, #ff0080 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .quote-card:hover .text-gray-400 {
-            color: rgba(255, 255, 255, 0.7);
+        .neon-glow {
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor;
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.8),
+                0 0 0 1px rgba(0, 255, 255, 0.1),
+                0 0 30px rgba(0, 255, 255, 0.2);
+        }
+
+        .btn-cyber {
+            position: relative;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: #00ffff;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .btn-cyber::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-cyber:hover::before {
+            left: 100%;
+        }
+
+        .btn-cyber:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border-color: rgba(0, 255, 255, 0.6);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 50%, #00ffff 100%);
+            border: none;
+            color: #0f172a;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #00ffff 0%, #8b5cf6 50%, #ff0080 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-primary:hover::before {
+            opacity: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-primary span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 255, 0.5);
+        }
+
+        /* Floating elements */
+        .floating-element {
+            position: absolute;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .code-snippet {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            color: #00ffff;
         }
     </style>
 </head>
-<body class="font-sans">
-    <div class="min-h-screen gradient-bg relative overflow-hidden">
-        <div class="absolute top-20 left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full animate-float"></div>
-        <div class="absolute top-40 right-20 w-16 h-16 bg-white bg-opacity-5 rounded-full animate-float" style="animation-delay: -2s;"></div>
-        <div class="absolute bottom-20 left-1/4 w-12 h-12 bg-white bg-opacity-10 rounded-full animate-float" style="animation-delay: -4s;"></div>
+<body class="font-primary bg-dark-950 text-gray-100 overflow-x-hidden">
+    <div class="fixed inset-0 matrix-bg">
+        <div class="floating-element w-32 h-32 top-20 left-10 rounded-lg rotate-12 animate-float opacity-30"></div>
+        <div class="floating-element w-24 h-24 top-1/3 right-20 rounded-full animate-float opacity-20" style="animation-delay: -2s;"></div>
+        <div class="floating-element w-16 h-16 bottom-1/4 left-1/4 rotate-45 animate-float opacity-25" style="animation-delay: -4s;"></div>
+        <div class="floating-element w-20 h-20 top-2/3 right-1/3 rounded-lg rotate-45 animate-float opacity-15" style="animation-delay: -6s;"></div>
 
-        <header class="relative z-10 pt-8 pb-12">
-            <div class="container mx-auto px-6 text-center">
-                <h1 class="text-6xl md:text-8xl font-bold text-white mb-4 animate-fade-in">
-                    <span class="inline-block animate-float">🦀</span> 
-                    <span class="bg-gradient-to-r from-pink-200 to-purple-200 bg-clip-text text-transparent">
-                        Rusted Quotes
-                    </span>
-                </h1>
-                <p class="text-xl md:text-2xl text-white text-opacity-90 mb-8 animate-slide-up">
-                    Discover wisdom, share inspiration, built with WebAssembly & Rust
-                </p>
-                
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up">
-                    <button id="random-quote-btn" class="bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
-                        ✨ Get Random Quote
-                    </button>
-                    <button id="add-quote-btn" class="glass-effect text-purple-700 font-bold py-4 px-8 rounded-2xl shadow-xl hover:bg-white hover:bg-opacity-90 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
-                        📝 Add Your Quote
-                    </button>
+        <div class="absolute top-40 left-5 code-snippet px-3 py-2 rounded text-xs opacity-20 animate-float">
+            <span class="text-neon-purple">fn</span> <span class="text-neon-cyan">main()</span> { }
+        </div>
+        <div class="absolute bottom-40 right-10 code-snippet px-3 py-2 rounded text-xs opacity-15 animate-float" style="animation-delay: -3s;">
+            <span class="text-neon-green">impl</span> <span class="text-neon-cyan">Quote</span>
+        </div>
+    </div>
+
+    <div class="relative z-10 min-h-screen">
+        <header class="pt-12 pb-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center space-y-8">
+                    <div class="animate-fade-in">
+                        <div class="inline-flex items-center gap-4 mb-6">
+                            <div class="text-6xl animate-float">🦀</div>
+                            <div class="h-16 w-px bg-gradient-to-b from-transparent via-neon-cyan to-transparent"></div>
+                            <div class="text-right">
+                                <h1 class="text-5xl md:text-7xl font-bold text-gradient leading-tight">
+                                    Rusted Quotes
+                                </h1>
+                                <div class="text-neon-cyan font-mono text-sm tracking-wider opacity-80">
+                                    v1.0.0 • WASM
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="animate-slide-up" style="animation-delay: 0.2s;">
+                        <p class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                            Discover wisdom, share inspiration
+                        </p>
+                        <p class="text-sm md:text-base text-neon-cyan font-mono mt-2 opacity-70">
+                            Built with <span class="text-neon-purple">Rust</span> • <span class="text-neon-green">WebAssembly</span> • <span class="text-neon-pink">Modern Web Tech</span>
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-6 justify-center items-center animate-slide-up" style="animation-delay: 0.4s;">
+                        <button id="random-quote-btn" class="btn-primary px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl min-w-[200px] group">
+                            <span class="flex items-center gap-3">
+                                <svg class="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                </svg>
+                                Random Quote
+                            </span>
+                        </button>
+                        
+                        <button id="add-quote-btn" class="btn-cyber px-8 py-4 rounded-2xl font-bold text-lg min-w-[200px] group">
+                            <span class="flex items-center gap-3">
+                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                Add Quote
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <main class="relative z-10 pb-16">
+        <section class="pb-20">
             <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <div class="glass-effect rounded-3xl p-8 max-w-md mx-auto shadow-2xl">
-                        <h2 class="text-2xl font-bold text-purple-800 mb-4">Community Wisdom</h2>
-                        <div class="text-4xl font-bold text-purple-600" id="quote-count">Loading...</div>
-                        <p class="text-purple-700 opacity-80 mt-2">inspiring quotes shared</p>
+                <div class="max-w-md mx-auto animate-fade-in" style="animation-delay: 0.6s;">
+                    <div class="glass-morphism rounded-3xl p-8 cyber-border text-center">
+                        <div class="mb-4">
+                            <div class="inline-flex items-center gap-2 text-neon-cyan mb-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span class="font-mono text-sm tracking-wider">SYSTEM STATUS</span>
+                            </div>
+                            <h2 class="text-2xl font-bold text-white mb-4">Community Wisdom</h2>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="text-6xl font-bold text-gradient neon-glow" id="quote-count">
+                                Loading...
+                            </div>
+                            <p class="text-gray-400 font-mono text-sm">
+                                >> inspiring_quotes.count()
+                            </p>
+                            <div class="h-px bg-gradient-to-r from-transparent via-neon-cyan to-transparent"></div>
+                            <div class="flex justify-center gap-4 text-xs font-mono text-gray-500">
+                                <span>RUST</span>
+                                <span>•</span>
+                                <span>WASM</span>
+                                <span>•</span>
+                                <span>MYSQL</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
+        <main class="pb-20">
+            <div class="container mx-auto px-6">
                 <div class="max-w-7xl mx-auto">
-                    <h2 class="text-3xl font-bold text-white text-center mb-12">Latest Quotes</h2>
-                    <div id="quotes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
-                        <div class="col-span-full text-center py-12">
-                            <div class="text-white text-opacity-70 text-lg">Loading amazing quotes...</div>
+                    <div class="text-center mb-16 animate-fade-in" style="animation-delay: 0.8s;">
+                        <div class="inline-flex items-center gap-4 mb-4">
+                            <div class="h-px bg-gradient-to-r from-transparent via-neon-cyan to-transparent w-20"></div>
+                            <h2 class="text-3xl md:text-4xl font-bold text-white">
+                                Latest <span class="text-gradient">Wisdom</span>
+                            </h2>
+                            <div class="h-px bg-gradient-to-l from-transparent via-neon-cyan to-transparent w-20"></div>
+                        </div>
+                        <p class="text-gray-400 font-mono text-sm">
+                            { explore_quotes() }
+                        </p>
+                    </div>
+
+                    <div id="quotes-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 animate-fade-in" style="animation-delay: 1s;">
+                        <div class="col-span-full">
+                            <div class="glass-morphism rounded-2xl p-12 text-center cyber-border">
+                                <div class="animate-pulse space-y-4">
+                                    <div class="text-neon-cyan text-2xl">🔄</div>
+                                    <div class="text-gray-300 text-lg font-mono">
+                                        Loading amazing quotes...
+                                    </div>
+                                    <div class="text-gray-500 text-sm">
+                                        Connecting to wisdom database
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
 
-        <footer class="relative z-10 text-center text-white text-opacity-70 pb-8">
-            <div class="container mx-auto px-6">
-                <p class="text-sm">Built with ❤️ using Rust, WebAssembly, and modern web technologies</p>
+        <footer class="pb-8">
+            <div class="container mx-auto px-6 text-center">
+                <div class="glass-morphism rounded-2xl p-6 max-w-2xl mx-auto">
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-gray-400 text-sm">
+                        <div class="flex items-center gap-2">
+                            <span>Built with</span>
+                            <span class="text-red-400">❤️</span>
+                            <span>using</span>
+                        </div>
+                        <div class="flex items-center gap-2 font-mono">
+                            <span class="text-neon-purple">Rust</span>
+                            <span>•</span>
+                            <span class="text-neon-green">WebAssembly</span>
+                            <span>•</span>
+                            <span class="text-neon-cyan">Modern Web</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs text-gray-500 font-mono">
+                        © 2024 • Rusted Quotes • Version 1.0.0
+                    </div>
+                </div>
             </div>
         </footer>
     </div>
 
-    <div id="quote-modal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 hidden animate-fade-in">
-        <div id="modal-content" class="animate-slide-up">
+    <div id="quote-modal" class="fixed inset-0 bg-black bg-opacity-80 backdrop-blur-md flex items-center justify-center z-50 hidden animate-fade-in p-4">
+        <div id="modal-content" class="animate-slide-up w-full max-w-2xl">
         </div>
     </div>
 </body>
