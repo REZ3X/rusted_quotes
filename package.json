@@ -4,6 +4,12 @@
   "scripts": {
     "dev": "trunk serve",
     "build": "trunk build --release",
-    "clean": "trunk clean"
+    "clean": "trunk clean",
+    "server": "cargo run --bin server --features server",
+    "dev-full": "concurrently \"npm run server\" \"npm run dev\"",
+    "setup-db": "mysql -u root -p -e \"CREATE DATABASE IF NOT EXISTS quotes_db;\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
   }
 }

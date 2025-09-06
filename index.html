@@ -3,43 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rusted Quotes</title>
-    <script src="https://cdn.tailwindcss.com/3.4.0"></script>
+    <title>Rusted Quotes - Inspire & Be Inspired</title>
     <link data-trunk rel="rust" />
-</head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4">
-                🦀 Rusted Quotes
-            </h1>
-            <p class="text-xl text-gray-600">Inspirational quotes powered by WebAssembly & Rust</p>
-        </header>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'float': 'float 6s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
 
-        <main class="max-w-4xl mx-auto">
-            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
-                <div id="quote-display" class="text-center">
-                    <blockquote class="text-2xl md:text-3xl font-medium text-gray-800 mb-6 italic">
-                        Click the button below to get an inspiring quote!
-                    </blockquote>
-                </div>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .glass-effect {
+            backdrop-filter: blur(16px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.125);
+        }
+
+        .quote-card:hover {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .quote-card:hover cite {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .quote-card:hover .text-gray-400 {
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <div class="min-h-screen gradient-bg relative overflow-hidden">
+        <div class="absolute top-20 left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full animate-float"></div>
+        <div class="absolute top-40 right-20 w-16 h-16 bg-white bg-opacity-5 rounded-full animate-float" style="animation-delay: -2s;"></div>
+        <div class="absolute bottom-20 left-1/4 w-12 h-12 bg-white bg-opacity-10 rounded-full animate-float" style="animation-delay: -4s;"></div>
+
+        <header class="relative z-10 pt-8 pb-12">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-6xl md:text-8xl font-bold text-white mb-4 animate-fade-in">
+                    <span class="inline-block animate-float">🦀</span> 
+                    <span class="bg-gradient-to-r from-pink-200 to-purple-200 bg-clip-text text-transparent">
+                        Rusted Quotes
+                    </span>
+                </h1>
+                <p class="text-xl md:text-2xl text-white text-opacity-90 mb-8 animate-slide-up">
+                    Discover wisdom, share inspiration, built with WebAssembly & Rust
+                </p>
                 
-                <div class="text-center">
-                    <button 
-                        id="new-quote-btn" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105">
-                        Get New Quote
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up">
+                    <button id="random-quote-btn" class="bg-gradient-to-r from-pink-500 to-violet-500 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl hover:shadow-pink-500/25 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
+                        ✨ Get Random Quote
+                    </button>
+                    <button id="add-quote-btn" class="glass-effect text-purple-700 font-bold py-4 px-8 rounded-2xl shadow-xl hover:bg-white hover:bg-opacity-90 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1">
+                        📝 Add Your Quote
                     </button>
                 </div>
             </div>
+        </header>
 
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Statistics</h2>
-                <p class="text-gray-600">
-                    Total quotes available: <span id="quote-count" class="font-bold text-blue-600">Loading...</span>
-                </p>
+        <main class="relative z-10 pb-16">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <div class="glass-effect rounded-3xl p-8 max-w-md mx-auto shadow-2xl">
+                        <h2 class="text-2xl font-bold text-purple-800 mb-4">Community Wisdom</h2>
+                        <div class="text-4xl font-bold text-purple-600" id="quote-count">Loading...</div>
+                        <p class="text-purple-700 opacity-80 mt-2">inspiring quotes shared</p>
+                    </div>
+                </div>
+
+                <div class="max-w-7xl mx-auto">
+                    <h2 class="text-3xl font-bold text-white text-center mb-12">Latest Quotes</h2>
+                    <div id="quotes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
+                        <div class="col-span-full text-center py-12">
+                            <div class="text-white text-opacity-70 text-lg">Loading amazing quotes...</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
+
+        <footer class="relative z-10 text-center text-white text-opacity-70 pb-8">
+            <div class="container mx-auto px-6">
+                <p class="text-sm">Built with ❤️ using Rust, WebAssembly, and modern web technologies</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="quote-modal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 hidden animate-fade-in">
+        <div id="modal-content" class="animate-slide-up">
+        </div>
     </div>
 </body>
 </html>
