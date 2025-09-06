@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rusted Quotes</title>
+    <script src="https://cdn.tailwindcss.com/3.4.0"></script>
+    <link data-trunk rel="rust" />
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4">
+                🦀 Rusted Quotes
+            </h1>
+            <p class="text-xl text-gray-600">Inspirational quotes powered by WebAssembly & Rust</p>
+        </header>
+
+        <main class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                <div id="quote-display" class="text-center">
+                    <blockquote class="text-2xl md:text-3xl font-medium text-gray-800 mb-6 italic">
+                        Click the button below to get an inspiring quote!
+                    </blockquote>
+                </div>
+                
+                <div class="text-center">
+                    <button 
+                        id="new-quote-btn" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+                        Get New Quote
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Statistics</h2>
+                <p class="text-gray-600">
+                    Total quotes available: <span id="quote-count" class="font-bold text-blue-600">Loading...</span>
+                </p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

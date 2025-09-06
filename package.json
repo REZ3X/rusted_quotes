@@ -1,0 +1,9 @@
+{
+  "name": "rusted-quotes",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "trunk serve",
+    "build": "trunk build --release",
+    "clean": "trunk clean"
+  }
+}
